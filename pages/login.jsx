@@ -3,11 +3,14 @@ import Link from 'next/link';
 import React from 'react';
 import {FaGoogle} from 'react-icons/fa';
 import {BsFacebook, BsGithub} from 'react-icons/bs';
-import { useSession, signIn, signOut } from "next-auth/react"
+import {signIn } from "next-auth/react"
 
 const Login = () => {
     async function handleGoogleLogin(){
         signIn('google', {callbackUrl:'http://localhost:3000/'})
+    }
+    const handleGithubLogin = () => {
+        signIn('github', {callbackUrl: 'http://localhost:3000/'})
     }
     return (
         <div>
@@ -36,7 +39,7 @@ const Login = () => {
                     <div className='flex items-center text-4xl my-2'>
                         <FaGoogle onClick={handleGoogleLogin} className='mx-2 cursor-pointer' />
                         <BsFacebook className='mx-2 cursor-pointer' />
-                        <BsGithub className='mx-2 cursor-pointer' />
+                        <BsGithub onClick={handleGithubLogin} className='mx-2 cursor-pointer' />
                     </div>
                 </div>
             </main>
