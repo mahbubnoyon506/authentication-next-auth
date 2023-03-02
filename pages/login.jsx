@@ -1,16 +1,36 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
-import {FaGoogle} from 'react-icons/fa';
-import {BsFacebook, BsGithub} from 'react-icons/bs';
-import {signIn } from "next-auth/react"
+import { FaGoogle } from 'react-icons/fa';
+import { BsFacebook, BsGithub } from 'react-icons/bs';
+import { signIn } from "next-auth/react"
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 
 const Login = () => {
-    async function handleGoogleLogin(){
-        signIn('google', {callbackUrl:'http://localhost:3000/'})
+    const router = useRouter()
+    const { register, formState: { errors }, handleSubmit, reset } = useForm();
+
+    async function handleGoogleLogin() {
+        signIn('google', { callbackUrl: 'http://localhost:3000/' })
     }
     const handleGithubLogin = () => {
-        signIn('github', {callbackUrl: 'http://localhost:3000/'})
+        signIn('github', { callbackUrl: 'http://localhost:3000/' })
+    }
+
+    const onSubmit = async (data) => {
+        console.log(data)
+        const res = await signIn('credentials', {
+            redirect: false,
+            email: data.email,
+            password: data.password,
+            callbackUrl: '/'
+        })
+        if(res.status === 200){
+            router.push(res.url)
+            reset()
+        }
+        // console.log(res)
     }
     return (
         <div>
@@ -22,14 +42,20 @@ const Login = () => {
                     <h2 className='text-xl md:text-2xl lg:text-4xl font-semibold text-center text-slate-100 py-5'>Login</h2>
                     <p className='text-sm md:text-base text-center text-slate-100'>Login with your expected credintial.</p>
                 </div>
-                <form className=''>
+                <form className='' onSubmit={handleSubmit(onSubmit)}>
                     <div className='mb-3'>
                         <label className='block' htmlFor="">Your Email</label>
-                        <input className='py-1 pl-2 mt-2 rounded focus:outline-none bg-slate-600' type="email" name="" id="" placeholder='Type email' />
+                        <input
+                            {...register("email", { required: true })}
+                            className='py-1 pl-2 mt-2 rounded focus:outline-none bg-slate-600' type='email' placeholder='Type email' />
+                        {errors.email && <p className='text-sm text-rose-700'>Email is required</p>}
                     </div>
                     <div>
                         <label className='block' htmlFor="">Your Password</label>
-                        <input className='py-1 pl-2 mt-2 rounded focus:outline-none bg-slate-600' type="password" name="" id="" placeholder='Type password' />
+                        <input
+                            {...register("password", { required: true })}
+                            className='py-1 pl-2 mt-2 rounded focus:outline-none bg-slate-600' type='password' placeholder='Type password' />
+                        {errors.password && <p className='text-sm text-rose-700'>Password is required</p>}
                     </div>
                     <input className='bg-slate-600 rounded py-2 px-5 cursor-pointer mt-3' type="submit" value="Login" />
                 </form>
